@@ -4,7 +4,7 @@
  * Plugin URI:  https://github.com/islandboymv/github-push-updates
  * Description: Installs updates for plugins that self-update from GitHub Releases (Plugin Update Checker) as soon as a release is published. A GitHub webhook triggers the update within a minute; an hourly check catches anything a webhook missed.
  * Author:      Islandboy
- * Version:     0.1.0
+ * Version:     0.1.1
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * License:     GPL-2.0-or-later
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'GPU_VERSION', '0.1.0' );
+define( 'GPU_VERSION', '0.1.1' );
 define( 'GPU_FILE', __FILE__ );
 define( 'GPU_LOG_OPTION', 'gpu_log' );
 
@@ -185,7 +185,8 @@ function gpu_webhook( WP_REST_Request $request ) {
 	if ( 'ping' === $event ) {
 		return new WP_REST_Response( array( 'ok' => true, 'pong' => true ), 200 );
 	}
-	if ( 'release' !== $event || ! in_array( $payload['action'] ?? '', array( 'published', 'released' ), true ) ) {
+	// GitHub sends "created", "published" and "released" for one release; react once.
+	if ( 'release' !== $event || 'published' !== ( $payload['action'] ?? '' ) ) {
 		return new WP_REST_Response( array( 'ok' => true, 'ignored' => $event ), 200 );
 	}
 
